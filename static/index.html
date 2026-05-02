@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 敏感信息加密工具</title>
+    <meta name="description" content="本地运行的敏感信息脱敏工具，保护隐私安全">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部导航 -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🔒</span>
+                <h1>敏感信息加密工具</h1>
+            </div>
+            <p class="subtitle">本地运行 · 数据不出本机</p>
+        </header>
+
+        <!-- 模式切换 -->
+        <nav class="mode-switch">
+            <button class="mode-btn active" data-mode="mask" id="btn-mode-mask">
+                <span class="mode-icon">🛡️</span>
+                <span>脱敏</span>
+            </button>
+            <button class="mode-btn" data-mode="unmask" id="btn-mode-unmask">
+                <span class="mode-icon">🔓</span>
+                <span>还原</span>
+            </button>
+            <button class="mode-btn" data-mode="settings" id="btn-mode-settings">
+                <span class="mode-icon">⚙️</span>
+                <span>设置</span>
+            </button>
+        </nav>
+
+        <!-- ═══════ 脱敏面板 ═══════ -->
+        <section class="panel" id="panel-mask">
+            <div class="drop-zone" id="drop-mask">
+                <div class="drop-content">
+                    <div class="drop-icon">📄</div>
+                    <p class="drop-text">拖拽文件到此处，或 <label for="file-mask" class="file-label">点击选择</label></p>
+                    <p class="drop-hint">支持 txt · md · csv · docx · xlsx</p>
+                    <input type="file" id="file-mask" accept=".txt,.md,.csv,.docx,.xlsx" hidden>
+                </div>
+            </div>
+
+            <!-- 扫描结果 -->
+            <div class="scan-result hidden" id="scan-result">
+                <div class="result-header">
+                    <h3>📊 检测结果</h3>
+                    <span class="result-filename" id="scan-filename"></span>
+                </div>
+                <div class="result-stats" id="scan-stats"></div>
+                <div class="result-items" id="scan-items"></div>
+                <div class="result-actions">
+                    <button class="btn btn-primary" id="btn-do-mask">
+                        <span>🛡️ 确认脱敏</span>
+                    </button>
+                    <button class="btn btn-ghost" id="btn-cancel-mask">取消</button>
+                </div>
+            </div>
+
+            <!-- 脱敏完成 -->
+            <div class="mask-done hidden" id="mask-done">
+                <div class="done-icon">✅</div>
+                <h3>脱敏完成</h3>
+                <p class="done-info" id="done-info"></p>
+                <div class="done-actions">
+                    <button class="btn btn-primary" id="btn-download-masked">⬇️ 下载脱敏文件</button>
+                    <button class="btn btn-ghost" id="btn-new-mask">继续处理</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ 还原面板 ═══════ -->
+        <section class="panel hidden" id="panel-unmask">
+            <div class="unmask-grid">
+                <div class="unmask-file">
+                    <h3>📄 上传 AI 处理后的文件</h3>
+                    <div class="drop-zone drop-zone-small" id="drop-unmask">
+                        <div class="drop-content">
+                            <div class="drop-icon">📄</div>
+                            <p class="drop-text">拖拽或 <label for="file-unmask" class="file-label">选择文件</label></p>
+                            <input type="file" id="file-unmask" accept=".txt,.md,.csv,.docx,.xlsx" hidden>
+                        </div>
+                    </div>
+                    <p class="selected-file hidden" id="unmask-selected"></p>
+                </div>
+                <div class="unmask-mapping">
+                    <h3>🔑 选择映射表</h3>
+                    <div class="mapping-list" id="mapping-list">
+                        <p class="loading">加载中...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button class="btn btn-primary" id="btn-do-unmask" disabled>
+                    <span>🔓 执行还原</span>
+                </button>
+            </div>
+
+            <!-- 还原完成 -->
+            <div class="mask-done hidden" id="unmask-done">
+                <div class="done-icon">✅</div>
+                <h3>还原完成</h3>
+                <div class="done-actions">
+                    <button class="btn btn-primary" id="btn-download-restored">⬇️ 下载还原文件</button>
+                    <button class="btn btn-ghost" id="btn-new-unmask">继续还原</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ 设置面板 ═══════ -->
+        <section class="panel hidden" id="panel-settings">
+            <div class="settings-card">
+                <h3>📝 自定义敏感词列表</h3>
+                <p class="settings-hint">每行一个敏感词（人名、公司名、项目名等），工具会精确匹配这些词并替换。</p>
+                <textarea id="custom-words" class="settings-textarea" placeholder="张三&#10;李四&#10;XX科技有限公司"></textarea>
+                <div class="result-actions">
+                    <button class="btn btn-primary" id="btn-save-words">💾 保存</button>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h3>🗂️ 映射表管理</h3>
+                <div class="mapping-manage-list" id="mapping-manage-list">
+                    <p class="loading">加载中...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Toast 提示 -->
+        <div class="toast hidden" id="toast"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

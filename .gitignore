@@ -1,0 +1,21 @@
+# 密钥文件
+.secret_key
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 运行时数据目录
+uploads/
+output/
+mappings/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
+.DS_Store
